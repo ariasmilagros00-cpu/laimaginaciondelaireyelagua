@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Video</title>
+
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .player {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #000;
+    overflow: hidden;
+  }
+
+  /* Video completo siempre visible, sin recortes */
+  video#bg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* <<< NO RECORTA NUNCA */
+    background: #000;    /* relleno en barras */
+    outline: none;
+  }
+
+  /* Botón para activar sonido */
+  .sound-button {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 20;
+    background: rgba(255,255,255,0.95);
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-family: system-ui, sans-serif;
+    font-size: 14px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    cursor: pointer;
+    border: none;
+    transition: 0.25s;
+  }
+  .sound-button:hover {
+    transform: scale(1.08);
+  }
+
+  /* Oculta controles nativos */
+  video::-webkit-media-controls { 
+    display: none !important;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="player">
+  <video id="bg" playsinline autoplay loop muted preload="auto" poster="poster.jpg">
+    <!-- WebM recomendado para loop perfecto -->
+    <source src="video.webm" type="video/webm">
+    <source src="video.mp4" type="video/mp4">
+    Tu navegador no soporta video HTML5.
+  </video>
+
+  <button id="soundBtn" class="sound-button" style="display:none">
+    Activar sonido
+  </button>
+</div>
+
+<script>
+  const video = document.getElementById("bg");
+  const btn   = document.getElementById("soundBtn");
+
+  function tryPlay() {
+    const p = video.play();
+    if (p !== undefined) {
+      p.then(() => {
+        btn.style.display = "inline-block"; // mostrar botón para activar sonido
+      }).catch(() => {
+        btn.style.display = "inline-block";
+      });
+    } else {
+      btn.style.display = "inline-block";
+    }
+  }
+
+  tryPlay();
+
+  btn.addEventListener("click", async () => {
+    try {
+      video.muted = !video.muted;
+      if (!video.muted) {
+        await video.play();
+        btn.textContent = "Silenciar";
+      } else {
+        btn.textContent = "Activar sonido";
+      }
+    } catch (e) {
+      console.warn("Problema al activar sonido:", e);
+    }
+  });
+</script>
+
+</body>
+</html>
+
